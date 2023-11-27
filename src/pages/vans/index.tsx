@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { getVans } from "../../utils/getVans";
 
 export interface Van {
   name: string;
@@ -10,18 +11,34 @@ export interface Van {
   imageUrl: string;
 }
 
+interface ThrownError {
+  message: string;
+  statusCode: number;
+  statusText: string;
+}
+
 export default function Vans() {
   const [vans, setVans] = useState<Van[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<ThrownError | null>(null);
 
   useEffect(() => {
-    async function fetchVans() {
-      const response = await fetch("/api/vans");
-      const data = (await response.json()).vans as Van[];
-      setVans(data);
+    async function loadVans() {
+      try {
+        setIsLoading(true);
+        const data = await getVans();
+        setVans(data);
+      } catch (error) {
+        const { message } = error as unknown as ThrownError;
+        console.error(message);
+        setError(error as unknown as ThrownError);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
-    fetchVans();
+    loadVans();
   }, []);
 
   const typeFilter = searchParams.get("type");
@@ -31,7 +48,7 @@ export default function Vans() {
 
   const vanElements = filteredVans.map((van) => (
     <div key={van.id} className="van-tile">
-      <Link to={van.id}>
+      <Link to={van.id} state={{ search: "?" + searchParams.toString() }}>
         <img src={van.imageUrl} />
         <div className="van-info">
           <h3>{van.name}</h3>
@@ -44,6 +61,14 @@ export default function Vans() {
       </Link>
     </div>
   ));
+
+  if (isLoading) {
+    return <h1>Loading...</h1>;
+  }
+
+  if (error) {
+    return <h1>There was an error: {error.message}</h1>;
+  }
 
   return (
     <div className="van-list-container">
