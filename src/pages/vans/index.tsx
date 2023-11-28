@@ -1,5 +1,9 @@
-import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLoaderData,
+  useSearchParams,
+  LoaderFunctionArgs,
+} from "react-router-dom";
 import { getVans } from "../../utils/getVans";
 
 export interface Van {
@@ -11,35 +15,17 @@ export interface Van {
   imageUrl: string;
 }
 
-interface ThrownError {
-  message: string;
-  statusCode: number;
-  statusText: string;
+
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function loader(props: LoaderFunctionArgs) {
+  console.log(props);
+  return getVans();
 }
 
 export default function Vans() {
-  const [vans, setVans] = useState<Van[]>([]);
+  const vans = useLoaderData() as Awaited<ReturnType<typeof loader>>;
   const [searchParams, setSearchParams] = useSearchParams();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<ThrownError | null>(null);
-
-  useEffect(() => {
-    async function loadVans() {
-      try {
-        setIsLoading(true);
-        const data = await getVans();
-        setVans(data);
-      } catch (error) {
-        const { message } = error as unknown as ThrownError;
-        console.error(message);
-        setError(error as unknown as ThrownError);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    loadVans();
-  }, []);
 
   const typeFilter = searchParams.get("type");
   const filteredVans = typeFilter
@@ -61,14 +47,6 @@ export default function Vans() {
       </Link>
     </div>
   ));
-
-  if (isLoading) {
-    return <h1>Loading...</h1>;
-  }
-
-  if (error) {
-    return <h1>There was an error: {error.message}</h1>;
-  }
 
   return (
     <div className="van-list-container">

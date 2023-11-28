@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { createServer, Model, Response } from "miragejs";
+import { createServer, Model } from "miragejs";
 
 createServer({
   models: {
