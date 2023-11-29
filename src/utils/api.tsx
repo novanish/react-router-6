@@ -31,3 +31,29 @@ export async function getHostVans(id?: string) {
   const data = await res.json();
   return data.vans;
 }
+
+interface UserInfo {
+  email: string;
+  password: string;
+}
+export async function login(userInfo: UserInfo) {
+  const response = await fetch("api/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userInfo),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw {
+      message: data.message,
+      statusText: response.statusText,
+      status: response.status,
+    };
+  }
+
+  return data as { token: string };
+}

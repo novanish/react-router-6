@@ -6,8 +6,11 @@ import {
   useLoaderData,
 } from "react-router-dom";
 import { getHostVans } from "../../../../utils/api";
+import { requireAuth } from "../../../../utils/requireAuth";
 
-export function loader({ params }: LoaderFunctionArgs) {
+
+export async function loader({params}:LoaderFunctionArgs) {
+  await requireAuth();
   return getHostVans(params["id"]!);
 }
 
