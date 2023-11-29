@@ -4,7 +4,7 @@ import {
   useSearchParams,
   LoaderFunctionArgs,
 } from "react-router-dom";
-import { getVans } from "../../utils/getVans";
+import { getVans } from "../../utils/api";
 
 export interface Van {
   name: string;
