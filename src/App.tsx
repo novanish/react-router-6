@@ -23,13 +23,21 @@ import HostVanDetailLayout, {
 import HostVanDetail from "./pages/host/vans/$id";
 import NotFound from "./pages/not-found";
 import VansError from "./pages/vans/error";
-import Login, { loader as loginLoader } from "./pages/login";
+import Login, {
+  loader as loginLoader,
+  action as loginAction,
+} from "./pages/login";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
       <Route index element={<Home />} />
-      <Route path="login" element={<Login />} loader={loginLoader} />
+      <Route
+        path="login"
+        element={<Login />}
+        loader={loginLoader}
+        action={loginAction}
+      />
       <Route path="about" element={<About />} />
 
       <Route

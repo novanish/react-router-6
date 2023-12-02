@@ -1,4 +1,8 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
+
+function fakeLogOut() {
+  localStorage.removeItem("loggedIn");
+}
 
 export function Navbar() {
   const activeStyles = {
@@ -34,6 +38,15 @@ export function Navbar() {
         >
           Vans
         </NavLink>
+        <Link to="login" className="login-link">
+          <img
+            src="../assets/images/avatar-icon.png"
+            alt="log-in icon"
+            className="login-icon"
+          />
+        </Link>
+
+        <button onClick={fakeLogOut}>X</button>
       </nav>
     </header>
   );

@@ -1,8 +1,10 @@
-import { useState } from "react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router-dom";
 import {
   useLoaderData,
-  type LoaderFunctionArgs,
-  useNavigate,
+  Form,
+  redirect,
+  useActionData,
+  useNavigation,
 } from "react-router-dom";
 import { login } from "../../utils/api";
 
@@ -11,67 +13,47 @@ export function loader({ request }: LoaderFunctionArgs) {
   return searchParams.get("message");
 }
 
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  try {
+    await login({ email, password });
+    window.localStorage.setItem("loggedIn", "true");
+
+    const { searchParams } = new URL(request.url);
+    const response = redirect(searchParams.get("redirectTo") || "/host");
+    // @ts-expect-error body is readonly
+    response.body = true;
+
+    return response;
+  } catch (error) {
+    const thrownError = error as Error;
+    return { message: thrownError.message };
+  }
+}
+
 export default function Login() {
   const message = useLoaderData() as ReturnType<typeof loader>;
-  const navigate = useNavigate();
-  const [loginFormData, setLoginFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [status, setStatus] = useState("idle");
-  const [error, setError] = useState<{ message: string } | null>(null);
+  const error = useActionData() as { message: string } | undefined;
+  const navigation = useNavigation();
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setStatus("submitting");
-
-    login(loginFormData)
-      .then((data) => {
-        console.log(data);
-        navigate("/host", { replace: true });
-      })
-      .catch((error) => {
-        setError(error);
-      })
-      .finally(() => {
-        setStatus("idle");
-      });
-  }
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    setLoginFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-
-  const isSubmitting = status === "submitting";
+  const isSubmitting =
+    navigation.state === "loading" || navigation.state === "submitting";
 
   return (
     <div className="login-container">
       <h1>Sign in to your account</h1>
       {message ? <h3 className="red">{message}</h3> : null}
       {error ? <h3 className="red">{error.message}</h3> : null}
-      <form onSubmit={handleSubmit} className="login-form">
-        <input
-          name="email"
-          onChange={handleChange}
-          type="email"
-          placeholder="Email address"
-          value={loginFormData.email}
-        />
-        <input
-          name="password"
-          onChange={handleChange}
-          type="password"
-          placeholder="Password"
-          value={loginFormData.password}
-        />
-        <button disabled={isSubmitting}>
+      <Form method="post" className="login-form" replace>
+        <input name="email" type="email" placeholder="Email address" />
+        <input name="password" type="password" placeholder="Password" />
+        <button disabled={isSubmitting} style={{ cursor: "pointer" }}>
           {isSubmitting ? "Logging in...." : "Log in"}
         </button>
-      </form>
+      </Form>
     </div>
   );
 }
