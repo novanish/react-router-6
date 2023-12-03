@@ -9,8 +9,8 @@ import { getHostVans } from "../../../../utils/api";
 import { requireAuth } from "../../../../utils/requireAuth";
 
 
-export async function loader({params}:LoaderFunctionArgs) {
-  await requireAuth();
+export async function loader({ params, request }:LoaderFunctionArgs) {
+  await requireAuth(request);
   return getHostVans(params["id"]!);
 }
 
