@@ -34,7 +34,7 @@ export default function HostVans() {
       <h1 className="host-vans-title">Your listed vans</h1>
       <div className="host-vans-list">
         <section>
-          <React.Suspense fallback={<h2>Loading.....</h2>}>
+          <React.Suspense fallback={<h2 aria-live="polite">Loading.....</h2>}>
             <Await resolve={dataPromise.vans}>{renderHostVans}</Await>
           </React.Suspense>
         </section>

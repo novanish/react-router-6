@@ -9,7 +9,7 @@ export default function VansError() {
   const error = useRouteError() as ThrownError;
   return (
     <>
-      <h1>Error: {error.message}</h1>
+      <h1 aria-live="assertive">Error: {error.message}</h1>
       <pre>
         {error.statusCode} - {error.statusText}
       </pre>

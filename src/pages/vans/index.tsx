@@ -15,8 +15,6 @@ export interface Van {
   imageUrl: string;
 }
 
-
-
 // eslint-disable-next-line react-refresh/only-export-components
 export function loader(props: LoaderFunctionArgs) {
   console.log(props);
@@ -34,8 +32,12 @@ export default function Vans() {
 
   const vanElements = filteredVans.map((van) => (
     <div key={van.id} className="van-tile">
-      <Link to={van.id} state={{ search: "?" + searchParams.toString() }}>
-        <img src={van.imageUrl} />
+      <Link
+        to={van.id}
+        state={{ search: "?" + searchParams.toString() }}
+      aria-label={`View details for ${van.name}, priced at $${van.price} per day`}
+      >
+        <img src={van.imageUrl} alt={`Image of ${van.name} van`} />
         <div className="van-info">
           <h3>{van.name}</h3>
           <p>
